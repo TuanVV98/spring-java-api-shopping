@@ -21,11 +21,11 @@ public class CategoryDTO {
 	private String name;
 
 	@Null
-	private Date created_at;
+	private Date createdATt;
 
 	@Null
-	private Date deleted_at;
+	private Date deletedAt;
 
 	@Null
-	private Date deleted_user;
+	private String deletedUser;
 }
