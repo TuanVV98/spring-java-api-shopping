@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,8 +27,9 @@ public class CategoryController {
 	public CategoryController(CategoryService category) {
 		this.category = category;
 	}
-
+//	@PreAuthorize("hasRole('USER')")
 	@GetMapping
+	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	public ResponseEntity<List<CategoryDTO>> findAll() {
 		System.out.println("****  Calling find all Category ****");
 
@@ -37,6 +39,7 @@ public class CategoryController {
 	}
 
 	@PostMapping("/create")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO cateDTO) {
 
 		System.out.println("****  Calling created Category ****");
@@ -47,11 +50,22 @@ public class CategoryController {
 	}
 
 	@PostMapping("/update")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<CategoryDTO> update(@Valid @RequestBody CategoryDTO cateDTO) {
 		System.out.println("****  Calling update Category ****");
-		System.out.println("Cate : " + cateDTO.getName() + "---" + cateDTO.getId());
+//		System.out.println("Cate : " + cateDTO.getName() + "---" + cateDTO.getId());
 
 		CategoryDTO newCateDTO = this.category.update(cateDTO);
+		return new ResponseEntity<>(newCateDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping("/findByDeletedAtIsNotNull")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<List<CategoryDTO>> findByDeletedAtIsNotNull() {
+		System.out.println("****  Calling find all Category by delete at is not null ****");
+
+		List<CategoryDTO> newCateDTO = this.category.findByDeletedAtIsNotNull();
+
 		return new ResponseEntity<>(newCateDTO, HttpStatus.OK);
 	}
 
