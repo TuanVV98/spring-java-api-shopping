@@ -2,9 +2,11 @@ package com.spring.dto.model;
 
 
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+
 
 import lombok.*;
 
@@ -21,11 +23,13 @@ public class CategoryDTO {
 	private String name;
 
 	@Null
-	private Date createdATt;
+	private Date createdAt;
 
 	@Null
 	private Date deletedAt;
 
 	@Null
 	private String deletedUser;
+	
+	private List<ProductDTO> product;
 }
