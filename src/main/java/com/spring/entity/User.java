@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,14 +22,16 @@ import org.hibernate.annotations.CreationTimestamp;
 import com.spring.enumeration.RoleEnum;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Setter
+@Getter
 @Table(name="users")
 public class User implements Serializable {
 	
@@ -59,7 +63,8 @@ public class User implements Serializable {
 	@Column(name="address")
 	private String address;
 	
-	@Column(name="role")
+	@Enumerated(EnumType.STRING)
+	@Column(name = "role")
 	private RoleEnum role;
 	
 	@Column(name="created_at")
@@ -71,8 +76,20 @@ public class User implements Serializable {
 	private Date deletedAt;
 	
 	@Column(name="deleted_user")
-	private Date deletedUser;
+	private Integer deletedUser;
 	
 	@OneToMany(mappedBy = "user")
 	private List<Order> orders;
+	
+	
+	/**
+	 * Method that verifies if the user is admin
+	 * 
+	 * @since 11/06/2021
+	 * 
+	 * @return boolean
+	 */
+	public boolean isAdmin() {
+		return RoleEnum.ROLE_ADMIN.toString().equals(this.role.toString());
+	}
 }

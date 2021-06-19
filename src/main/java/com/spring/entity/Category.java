@@ -18,13 +18,15 @@ import javax.persistence.TemporalType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Table(name = "categories")
 public class Category implements Serializable {
 
@@ -43,6 +45,7 @@ public class Category implements Serializable {
 	@Column(name="name")
 	private String name;
 
+
 	@Column(name="created_at" )
 	@Temporal(TemporalType.TIMESTAMP)
 	@CreationTimestamp
@@ -52,7 +55,7 @@ public class Category implements Serializable {
 	private Date deletedAt;
 
 	@Column(name="deleted_user")
-	private String deletedUser;
+	private Integer deletedUser;
 	
 	@OneToMany(
 			fetch = FetchType.LAZY,

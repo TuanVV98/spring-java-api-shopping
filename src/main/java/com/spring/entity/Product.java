@@ -19,6 +19,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.modelmapper.ModelMapper;
+
+import com.spring.dto.model.ProductDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,6 +42,9 @@ public class Product implements Serializable {
 	@Column(name="id")
 	private Long id;
 
+	@Column(name="model")
+	private String model;
+	
 	@Column(name="name")
 	private String name;
 	
@@ -47,6 +53,9 @@ public class Product implements Serializable {
 	
 	@Column(name="image")
 	private String image;
+	
+	@Column(name="description")
+	private String description;
 	
 	@Column(name="created_at")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -57,7 +66,7 @@ public class Product implements Serializable {
 	private Date deletedAt;
 
 	@Column(name="deleted_user")
-	private String deletedUser;
+	private Long deletedUser;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -72,5 +81,10 @@ public class Product implements Serializable {
 			fetch = FetchType.LAZY
 			)
 	private List<OrderDetails> order_detail;
+	
+	
+	public ProductDTO convertEntityToDTO() {
+		return new ModelMapper().map(this, ProductDTO.class);
+	}
 
 }

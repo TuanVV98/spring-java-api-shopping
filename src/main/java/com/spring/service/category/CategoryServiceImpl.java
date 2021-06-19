@@ -74,4 +74,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 	}
 
+	@Override
+	public List<CategoryDTO> findByDeletedAtIsNotNull() {
+		return mapperUtil.mapList(this.category.findByDeletedAtIsNotNull(), CategoryDTO.class);
+	}
+
 }

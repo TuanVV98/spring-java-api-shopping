@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.spring.dto.model.CategoryDTO;
 //import com.spring.entity.Category;
+import com.spring.entity.Category;
 
 public interface CategoryService {
 
@@ -44,4 +45,14 @@ public interface CategoryService {
 	 * @return <code>List<CategoryDTO></code> Object
 	 */
 	List<CategoryDTO> findByDeletedAtIsNull();
+	
+
+	/**
+	 * Method that find by deletedAt is not null in Categories
+	 * 
+	 * @since 16/06/2021
+	 * 
+	 * @return <code>List<CategoryDTO></code> Object
+	 */
+	List<CategoryDTO>   findByDeletedAtIsNotNull();
 }

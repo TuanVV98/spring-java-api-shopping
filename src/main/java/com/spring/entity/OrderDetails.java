@@ -17,6 +17,9 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.modelmapper.ModelMapper;
+
+import com.spring.dto.model.OrderDetailsDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -53,7 +56,7 @@ public class OrderDetails implements Serializable {
 	private Date deletedAt;
 	
 	@Column(name="deleted_user")
-	private String deletedUser;
+	private Integer deletedUser;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
@@ -70,4 +73,8 @@ public class OrderDetails implements Serializable {
 			referencedColumnName = "id"
 			)
 	private Product product;
+	
+	public OrderDetailsDTO convertEntiyToDTO() {
+		return new ModelMapper().map(this, OrderDetailsDTO.class);
+	}
 }
