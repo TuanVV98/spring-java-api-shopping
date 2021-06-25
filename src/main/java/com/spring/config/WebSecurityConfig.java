@@ -55,7 +55,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {
 	/**
 	 * Method to create an BCrypt password encoder
 	 * 
-	 * @author Mariana Azevedo
 	 * @since 15/6/2021
 	 * 
 	 * @return PasswordEncoder object
