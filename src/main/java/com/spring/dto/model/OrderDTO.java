@@ -1,18 +1,16 @@
 package com.spring.dto.model;
 
-import java.util.Date;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-
-import org.modelmapper.ModelMapper;
-
-import com.spring.entity.Order;
-
+import com.spring.enumeration.OrderEnum;
+import com.spring.model.Order;
+import com.spring.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.modelmapper.ModelMapper;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Setter
 @Getter
@@ -20,25 +18,26 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OrderDTO {
 
-	
-	private Long id;
-	
-	@NotNull
-	private String address;
-	
-	@NotNull
-	private Date createdAt;
-	
-	@Null
-	private Date deletedAt;
-	
-	@Null
-	private Integer deletedUser;
-	
-	@NotNull
-	private Long userID;
-	
-	public Order convertDTOToEntity() {
-		return new ModelMapper().map(this, Order.class);
-	}
+    private Long id;
+
+    private double subTotal;
+
+    private OrderEnum status;
+
+    private String fullName;
+
+    private String mobile;
+
+    private String address;
+
+    private Date createdAt;
+
+    private LocalDateTime updatedAt;
+
+    private Long userId;
+
+    public Order convertDTOToEntity() {
+        return new ModelMapper().map(this, Order.class);
+    }
+
 }

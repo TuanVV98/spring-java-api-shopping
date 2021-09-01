@@ -1,30 +1,44 @@
 package com.spring.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.spring.dto.model.ProductDTO;
+import com.spring.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.spring.entity.Category;
-import com.spring.entity.Product;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-	/**
-	 * Method Query creation findBy... in JPArepository
-	 * 
-	 * @since 07/06/2021
-	 * 
-	 * @return <code>List<Category></code> Object
-	 * {@link} https://viblo.asia/p/java-springboot-spring-data-jpa-1-tong-quan-va-khai-niem-jvElayjDlkw
-	 */
-	List<Product> findByCategoryId(Long categoryID);
-	
-	Optional<Product> findByModel(String model);
 
-	List<Product>   findByDeletedAtIsNull();
-	
-	List<Product>   findByDeletedAtIsNotNull();
+    @Query(value = "SELECT new com.spring.dto.model.ProductDTO("
+            + " p.id, p.model, p.name, p.image, p.price, p.description, p.createdAt,"
+            + " p.updatedAt, p.deletedAt, p.user.id, c.id, c.name) "
+            + "FROM Product p "
+            + "INNER JOIN Category c ON p.category.id = c.id "
+            + "WHERE p.deletedAt IS NULL ")
+    List<ProductDTO> findByDeletedAtIsNull();
+
+    @Query(value = "SELECT new com.spring.dto.model.ProductDTO("
+            + " p.id, p.model, p.name, p.image, p.price, p.description, p.createdAt,"
+            + " p.updatedAt, p.deletedAt, p.user.id, c.id, c.name) "
+            + "FROM Product p "
+            + "INNER JOIN Category c ON p.category.id = c.id "
+            + "WHERE p.deletedAt IS NOT NULL ")
+    List<ProductDTO> findByDeletedAtIsNotNull();
+
+    @Query(value = "SELECT p FROM Product p "
+                    + "INNER JOIN Category c ON p.category.id = c.id "
+                    + "WHERE c.name =:name "
+                    + "AND p.deletedAt IS NULL ")
+    List<Product> findByCategory(@Param("name") String name);
+
+    @Query(value = "SELECT p FROM Product p WHERE p.model =:model AND p.deletedAt IS NULL")
+    Optional<Product> findByModelAndDeletedAtIsNull(@Param("model") String model);
+
+    @Query(value = "SELECT p FROM Product p WHERE p.model =:model ")
+    Optional<Product> findByModel(@Param("model") String model);
 }

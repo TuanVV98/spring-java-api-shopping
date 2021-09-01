@@ -1,95 +1,92 @@
 package com.spring.service.product;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.spring.dto.model.ProductDTO;
+import com.spring.model.Product;
+import com.spring.repository.ProductRepository;
+import com.spring.service.files.FilesStorageService;
+import com.spring.utils.mapper.MapperUtil;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.spring.dto.model.ProductDTO;
-import com.spring.entity.Product;
-import com.spring.repository.ProductRepository;
-import com.spring.util.mappers.MapperUtil;
-import com.spring.util.mappers.ProductMapper;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
-	@Autowired
-	private ProductRepository productRespo;
+    private ProductRepository productRepository;
 
-	@Autowired
-	private ProductMapper proMapper;
+    private FilesStorageService filesStorageService;
 
-	@Autowired
-	private MapperUtil mapperUtil;
+    private MapperUtil mapperUtil;
 
-	public ProductServiceImpl(ProductRepository productRespo, ProductMapper proMapper, MapperUtil mapperUtil) {
-		this.productRespo = productRespo;
-		this.proMapper = proMapper;
-		this.mapperUtil = mapperUtil;
+    @Autowired
+    public ProductServiceImpl(
+            ProductRepository productRepository,
+            FilesStorageService filesStorageService,
+            MapperUtil mapperUtil
+    ) {
+        this.productRepository = productRepository;
+        this.filesStorageService = filesStorageService;
+        this.mapperUtil = mapperUtil;
+    }
 
-	}
+    @Override
+    public ProductDTO save(ProductDTO productDTO, MultipartFile file) {
+        Product entity = productDTO.convertDTOToEntity();
 
-	/**
-	 * @see ProductService#save(ProductDTO)
-	 */
-	@Override
-	public ProductDTO save(ProductDTO proDTO) {
-		Product proEntity = proDTO.convertDTOToEntity();
+        if (!file.isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+            String filename = uuid + "." + extension;
+//            System.out.println("file name :"+filename);
+            entity.setImage(filename);
+            this.filesStorageService.save(filename, file);
+        }
+        return this.productRepository.save(entity).convertEntityToDTO();
+    }
 
-		return this.proMapper.convertEntityToDTO(this.productRespo.save(proEntity));
-	}
+    @Override
+    public ProductDTO update(ProductDTO productDTO) {
+        Product product = this.productRepository.save(productDTO.convertDTOToEntity());
+        return product.convertEntityToDTO();
+    }
 
-	/**
-	 * @see ProductService#update(ProductDTO)
-	 */
-	@Override
-	public ProductDTO update(ProductDTO proDTO) {
-		Product proEntity = proDTO.convertDTOToEntity();
+    @Override
+    public List<ProductDTO> getAll() {
+        return this.productRepository.findByDeletedAtIsNull();
 
-		return this.proMapper.convertEntityToDTO(this.productRespo.save(proEntity));
-	}
+//        return mapperUtil.mapList(this.productRepository.findByDeletedAtIsNull(),ProductDTO.class);
+    }
 
-	/**
-	 * @see ProductService#findAll()
-	 */
-	@Override
-	public List<ProductDTO> findAll() {
-		List<ProductDTO> itemsDTO = new ArrayList<>();
+    @Override
+    public List<ProductDTO> getAllIsNull() {
+        return this.productRepository.findByDeletedAtIsNotNull();
+    }
 
-		this.productRespo.findAll().stream().forEach(t -> itemsDTO.add(t.convertEntityToDTO()));
-		return itemsDTO;
-	}
+    @Override
+    public List<ProductDTO> findByCategory(String name) {
+        return mapperUtil.mapList(this.productRepository.findByCategory(name), ProductDTO.class);
+    }
 
-	/**
-	 * @see ProductService#findByDeletedAtIsNull()
-	 */
-	@Override
-	public List<ProductDTO> findByDeletedAtIsNull() {
-		List<ProductDTO> itemsDTO = new ArrayList<>();
+    @Override
+    public Optional<ProductDTO> findByModelAndDeletedAtIsNull(String model) {
+        Optional<Product> entity = this.productRepository.findByModelAndDeletedAtIsNull(model);
+        if (entity.isPresent()) {
+            return entity.map(Product::convertEntityToDTO);
+        }
+        return Optional.empty();
+    }
 
-		this.productRespo.findByDeletedAtIsNull().stream().forEach(t -> itemsDTO.add(t.convertEntityToDTO()));
-		return itemsDTO;
-	}
-
-	/**
-	 * @see ProductService#findByCategory(Long categoryID)
-	 */
-	@Override
-	public List<ProductDTO> findByCategory(Long categoryID) {
-		List<ProductDTO> itemsDTO = new ArrayList<>();
-
-		this.productRespo.findByCategoryId(categoryID).stream().forEach(t -> itemsDTO.add(t.convertEntityToDTO()));
-		return itemsDTO;
-	}
-
-	@Override
-	public List<ProductDTO> findByDeletedAtIsNotNull() {
-		List<ProductDTO> itemsDTO = new ArrayList<>();
-
-		this.productRespo.findByDeletedAtIsNotNull().stream().forEach(t -> itemsDTO.add(t.convertEntityToDTO()));
-		return itemsDTO;
-	}
-
+    @Override
+    public Optional<ProductDTO> findByModel(String model) {
+        Optional<Product> entity = this.productRepository.findByModel(model);
+        if (entity.isPresent()) {
+            return entity.map(Product::convertEntityToDTO);
+        }
+        return Optional.empty();
+    }
 }

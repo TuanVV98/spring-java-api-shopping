@@ -1,55 +1,72 @@
 package com.spring.dto.model;
 
-import java.util.Date;
+import com.spring.enumeration.RoleEnum;
+import com.spring.enumeration.UserStatusEnum;
+import com.spring.model.User;
+import com.spring.utils.BcryptUtil;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
+import org.modelmapper.ModelMapper;
 
+
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.spring.util.security.BcryptUtil;
-
-import lombok.*;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserDTO {
 
-	@Autowired
-	private BcryptUtil bcryptUtil;
-	
-	private Long id;
-	
-	@NotNull
-	private String username;
-	
-	@NotNull
-	private String email;
-	
-	@NotNull
-	private String password;	
-	
-	@NotNull
-	private String address;
-	
-	@NotNull
-	@Pattern(regexp="^(ADMIN|USER)$", 
-	message="ADMIN or USER .")
-	private String role;
-	
-	@Null
-	private Date createdAt;
-	
-	@Null
-	private Date deletedAt;
-	
-	@Null
-	private Integer deletedUser;
-	
-	public String getPassword() {
-		return BcryptUtil.getHash(this.password);
-	}
+    private Long id;
+
+    @NotNull(message = "Username cannot be null.")
+    @Length(min = 1, max = 50, message = "Username must contain between 1 and  50 characters.")
+    private String username;
+
+    @NotNull(message = "Mobile cannot be null.")
+    @Size(min = 10, max = 10, message = "Mobile must contain 10 numbers")
+    @Pattern(
+            regexp = "(^$|[0-9]{10})",
+            message = "Invalid mobile !")
+    private String mobile;
+
+    @NotNull(message = "Email cannot be null.")
+    @Length(max = 100, message = "Email must be a maximum of 100 characters.")
+    @Email(message = "Invalid email !")
+    private String email;
+
+    @NotNull(message = "Password cannot be null.")
+    @Length(min = 6, message = "Password must contain at least 6 characters.")
+    private String password;
+
+    private UserStatusEnum status;
+
+    private RoleEnum role;
+
+    private Date registeredAt;
+
+    private LocalDateTime updateAt;
+
+    private LocalDateTime deletedAt;
+
+    public UserDTO(Long id, RoleEnum role) {
+        this.id = id;
+        this.role = role;
+    }
+
+    public String getPassword() {
+        return BcryptUtil.getHash(this.password);
+    }
+
+    public User convertDTOToEntity() {
+        return new ModelMapper().map(this, User.class);
+    }
 }

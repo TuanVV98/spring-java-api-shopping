@@ -1,82 +1,49 @@
 package com.spring.service.category;
 
-import java.util.List;
-
+import com.spring.dto.model.CategoryDTO;
+import com.spring.model.Category;
+import com.spring.repository.CategoryRepository;
+import com.spring.utils.mapper.MapperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.spring.dto.model.CategoryDTO;
-import com.spring.entity.Category;
-import com.spring.repository.CategoryRepository;
-import com.spring.util.mappers.CategoryMapper;
-import com.spring.util.mappers.MapperUtil;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-	@Autowired
-	private CategoryRepository category;
+    private CategoryRepository categoryRepository;
 
-	@Autowired
-	private CategoryMapper cateMapper;
+    private MapperUtil mapperUtil;
 
-	@Autowired
-	private MapperUtil mapperUtil;
+    @Autowired
+    public CategoryServiceImpl(CategoryRepository categoryRepository, MapperUtil mapperUtil) {
+        this.categoryRepository = categoryRepository;
+        this.mapperUtil = mapperUtil;
+    }
 
-	public CategoryServiceImpl(CategoryRepository category, MapperUtil mapperUtil, CategoryMapper cateMapper) {
-		this.category = category;
-		this.cateMapper = cateMapper;
-		this.mapperUtil = mapperUtil;
-	}
+    @Override
+    public CategoryDTO save(CategoryDTO categoryDTO) {
+        Category category = this.categoryRepository.save(categoryDTO.convertDTOToEntity());
+        return category.convertEntityToDTO();
+    }
 
-	/**
-	 * @see CategoryService#save(Category)
-	 */
-	@Override
-	public CategoryDTO save(CategoryDTO cateDTO) {
+    @Override
+    public CategoryDTO update(CategoryDTO categoryDTO) {
+//        categoryDTO.setUpdatedAt(LocalDateTime.now());
+        Category category = this.categoryRepository.save(categoryDTO.convertDTOToEntity());
+        return category.convertEntityToDTO();
+    }
 
-		Category cateEntity = this.cateMapper.convertDTOToEntity(cateDTO);
+    @Override
+    public List<CategoryDTO> findAllIsNull() {
+        return mapperUtil.mapList(this.categoryRepository.findByDeletedAtIsNull(),CategoryDTO.class);
+    }
 
-		return this.cateMapper.convertEntityToDTO(this.category.save(cateEntity));
-	}
-
-	/**
-	 * @see CategoryService#update(CategoryDTO)
-	 */
-	@Override
-	public CategoryDTO update(CategoryDTO cateDTO) {
-
-		Category cateEntity = this.cateMapper.convertDTOToEntity(cateDTO);
-
-		return this.cateMapper.convertEntityToDTO(this.category.save(cateEntity));
-	}
-
-	/**
-	 * @see CategoryService#findAll()
-	 */
-	@Override
-	public List<CategoryDTO> findAll() {
-
-//		for (int i = 0; i < this.category.findAll().size(); i++) {
-//			System.out.println("list cate : " + this.category.findAll().get(i).getCreatedAt());
-//		}
-		return mapperUtil.mapList(this.category.findAll(), CategoryDTO.class);
-	}
-
-	/**
-	 * @see CategoryService#findByDeletedAtIsNull()
-	 */
-
-	@Override
-	public List<CategoryDTO> findByDeletedAtIsNull() {
-
-		return mapperUtil.mapList(this.category.findByDeletedAtIsNull(), CategoryDTO.class);
-
-	}
-
-	@Override
-	public List<CategoryDTO> findByDeletedAtIsNotNull() {
-		return mapperUtil.mapList(this.category.findByDeletedAtIsNotNull(), CategoryDTO.class);
-	}
-
+    @Override
+    public List<CategoryDTO> findAllIsNotNull() {
+        return mapperUtil.mapList(this.categoryRepository.findByDeletedAtIsNotNull(),CategoryDTO.class);
+    }
 }
